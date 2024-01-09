@@ -16,7 +16,7 @@ redLED = Pin(15, Pin.OUT)
 
 # create needed sleep times for 10 words per minute dot = 0.12 seconds
 # 5 words per minute is 0.24 seconds
-dot = 0.24
+dot = 0.08
 dash = 3 * dot
 withinChar = dot
 betChar = 3 * dot
