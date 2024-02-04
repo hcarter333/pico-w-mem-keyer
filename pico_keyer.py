@@ -22,71 +22,53 @@ html = """<!DOCTYPE html>
 </html>
 """
 
-max_wait = 10
-while max_wait > 0:
-    if wlan.status() < 0 or wlan.status() >= 3:
-        break
-    max_wait -= 1
-    print('waiting for connection...')
-    time.sleep(1)
+def connect():
+    #Connect to WLAN
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    wlan.connect(ssid, password)
+    while wlan.isconnected() == False:
+        print('Waiting for connection...')
+        sleep(1)
+    ip == wlan.ifconfig()[0]
+    print(wlan.ifconfig())
+    return ip
 
-if wlan.status() != 3:
-    raise RuntimeError('network connection failed')
-else:
-    print('connected')
-    status = wlan.ifconfig()
-    print( 'ip = ' + status[0] )
+def open_socket(ip):
+    # Open a socket
+    address = (ip, 80)
+    connection = socket.socket()
+    connection.bind(address)
+    connection.listen(1)
+    return connection
 
-addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
-
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind(addr)
-s.listen(1)
-
-print('listening on', addr)
-
-# Listen for connections
-while True:
-    try:
-        cl, addr = s.accept()
-        print('client connected from', addr)
-        request = cl.recv(1024)
-        print(request)
-
+def serve(connection):
+    #Start a web server
+    state = 'OFF'
+    led.value(0)
+    temperature = 0
+    while True:
+        client = connection.accept()[0]
+        request = client.recv(1024)
         request = str(request)
-        led_on = request.find('/light/on')
-        led_off = request.find('/light/off')
-        print( 'led on = ' + str(led_on))
-        print( 'led off = ' + str(led_off))
-        print(' ========================')
-        print( 'request = ' + request)
-        print(' ========================')
-        m_start = request.find('msg')
-        m_end = request.find('bk')
-        print('start ' + str(m_start) + ' end ' + str(m_end))
-        msg = request[m_start+1, m_end-1]
-        pint('message ' + msg)
-        stateis = "Who are you?"
-
-        if led_on == 6:
-            print("led on")
-            led.value(1)
-            stateis = "LED is ON"
-
-        if led_off == 6:
-            print("led off")
+        try:
+            request = request.split()[1]
+        except IndexError:
+            pass
+        if request == '/lighton?':
             led.value(0)
-            stateis = "LED is OFF"
+            state = 'ON'
+        elif request =='/lightoff?':
+            led.value(0)
+            state = 'OFF'
+        html = webpage(temperature, state)
+        client.send(html)
+        client.close()
 
-        response = html % stateis
+try:
+    connect()
+    connection = open_socket(ip)
+    serve(connection)
+except KeyboardInterrupt:
+    machine.reset()
 
-        cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
-        cl.send(response)
-        cl.close()
-
-    except OSError as e:
-        s.close()
-        cl.close()
-        print('connection closed')
