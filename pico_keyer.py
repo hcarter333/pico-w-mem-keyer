@@ -9,10 +9,6 @@ led = machine.Pin('LED', machine.Pin.OUT)
 ssid = ''
 password = ''
 
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-wlan.connect(ssid, password)
-
 html = """<!DOCTYPE html>
 <html>
     <head> <title>Pico W</title> </head>
@@ -65,6 +61,23 @@ def serve(connection):
         client.send(html)
         client.close()
 
+def webpage(temperature, state):
+    #Template HTML
+    html = f"""
+            <!DOCTYPE html>
+            <html>
+            <form action="./lighton">
+            <input type="submit" value="Light on" />
+            </form>
+            <form action="./lightoff">
+            <input type="submit" value="Light off" />
+            </form>
+            <p>LED is {state}</p>
+            <p>Temperature is {temperature}</p>
+            </body>
+            </html>
+            """
+    return(html)
 try:
     connect()
     connection = open_socket(ip)
