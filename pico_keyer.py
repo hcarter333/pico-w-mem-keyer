@@ -78,6 +78,8 @@ def webpage(temperature, state):
             </html>
             """
     return(html)
+
+
 try:
     connect()
     connection = open_socket(ip)
