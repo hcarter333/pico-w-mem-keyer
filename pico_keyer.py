@@ -97,7 +97,6 @@ led = machine.Pin('LED', machine.Pin.OUT)
 html = """<!DOCTYPE html>
 <html>
     <head> <title>Pico W</title>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     </head>
     <body> <h1>Pico W</h1>
         <p>%s</p>
@@ -110,6 +109,9 @@ def webpage(temperature, state):
     html = f"""
             <!DOCTYPE html>
             <html>
+            <head>
+            <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+            </head>
             <form action="./on">
             <input type="text" id="msg" name="msg"><br><br>
             <input type="submit" value="Light on" /><br>
@@ -145,7 +147,7 @@ while max_wait > 0:
         break
     max_wait -= 1
     print('waiting for connection...' + str(max_wait))
-    sleep(1)
+    sleep(2)
 
 if wlan.status() != 3:
 
@@ -221,6 +223,9 @@ while True:
             led.value(0)
             stateis = "LED is OFF"
         
+        #if(request.find('favicon') != -1):
+           #cl.send('HTTP/1.0 404 Not FFOUND\r\n\r\nPage Not Found')
+           #cl.close
         #response = html % stateis
         #response = webpage("0", msg)
         #cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
