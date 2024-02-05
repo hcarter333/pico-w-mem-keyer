@@ -2,7 +2,7 @@ import network
 import socket
 from machine import Pin
 from utime import sleep
-
+import uasyncio as asyncio
 #===========================cw=======================
 # setup LED
 redLED = Pin(15, Pin.OUT)
@@ -122,7 +122,10 @@ def webpage(temperature, state):
             """
     return(html)
 
-
+async def send_msg(msg):
+    for char in msg:
+        charBlinks(char)
+    
 
 
 ssid = ''
@@ -188,7 +191,7 @@ while True:
 
         print('start ' + str(m_start) + ' end ' + str(m_end))
 
-        
+        msg = ""
         if(m_end != -1):
             msg = request[m_start+3:m_end]
             msg = msg.replace("%2F", "/")
@@ -199,10 +202,11 @@ while True:
 
         if led_on == 6:
             #output morse code
-            for char in msg:
-                charBlinks(char)
+            asyncio.run(send_msg(msg))
+            #for char in msg:
+            #    charBlinks(char)
             print("led on")
-            #led.value(1)
+            led.value(1)
             stateis = "Message sent"
 
         if led_off == 6:
@@ -211,7 +215,7 @@ while True:
             stateis = "LED is OFF"
         
         #response = html % stateis
-        response = webpage("0", stateis)
+        response = webpage("0", msg)
         cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
         cl.send(response)
         cl.close()
