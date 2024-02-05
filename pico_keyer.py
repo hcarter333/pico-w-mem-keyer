@@ -96,7 +96,9 @@ led = machine.Pin('LED', machine.Pin.OUT)
 
 html = """<!DOCTYPE html>
 <html>
-    <head> <title>Pico W</title> </head>
+    <head> <title>Pico W</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    </head>
     <body> <h1>Pico W</h1>
         <p>%s</p>
     </body>
@@ -187,21 +189,26 @@ while True:
         print(' ========================')
 
         m_start = request.find('msg')
-        m_end = request.find('bk')
+        m_end = request.find(' HTTP')
 
         print('start ' + str(m_start) + ' end ' + str(m_end))
 
         msg = ""
         if(m_end != -1):
-            msg = request[m_start+3:m_end]
+            msg = request[m_start+4:m_end]
             msg = msg.replace("%2F", "/")
             msg = msg.replace("+", " ")
+            msg = msg.replace("%3F", "?")
             print('message ' + msg)
         
         stateis = "Who are you?"
 
         if led_on == 6:
             #output morse code
+            response = webpage("0", msg)
+            cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
+            cl.send(response)
+            cl.close()
             asyncio.run(send_msg(msg))
             #for char in msg:
             #    charBlinks(char)
@@ -215,10 +222,10 @@ while True:
             stateis = "LED is OFF"
         
         #response = html % stateis
-        response = webpage("0", msg)
-        cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
-        cl.send(response)
-        cl.close()
+        #response = webpage("0", msg)
+        #cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
+        #cl.send(response)
+        #cl.close()
 
     except OSError as e:
         s.close()
