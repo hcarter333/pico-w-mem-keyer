@@ -110,7 +110,6 @@ def webpage(temperature, state):
             <!DOCTYPE html>
             <html>
             <head>
-            <link rel="icon" href="data:;base64,iVBORw0KGgo=">
             </head>
             <form action="./on">
             <input type="text" id="msg" name="msg"><br><br>
@@ -132,8 +131,8 @@ async def send_msg(msg):
     
 
 
-ssid = ''
-password = ''
+ssid = 'krypto'
+password = 'krypto3lefty'
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
@@ -163,7 +162,7 @@ addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind(addr)
-s.listen(1)
+s.listen(3)
 
 print('listening on', addr)
 
@@ -217,6 +216,7 @@ while True:
             print("led on")
             led.value(1)
             stateis = "Message sent"
+            msg = ""
 
         if led_off == 6:
             print("led off")
@@ -227,12 +227,12 @@ while True:
            #cl.send('HTTP/1.0 404 Not FFOUND\r\n\r\nPage Not Found')
            #cl.close
         #response = html % stateis
-        #response = webpage("0", msg)
-        #cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
-        #cl.send(response)
-        #cl.close()
+        response = webpage("0", msg)
+        cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
+        cl.send(response)
+        cl.close()
 
     except OSError as e:
-        s.close()
+        #s.close()
         cl.close()
-        print('connection closed')
+        print('connection closed ' + str(e))
