@@ -3,47 +3,9 @@
 <head>
 <link href="keyflex.css?body=1" rel="stylesheet" type="text/css" media="all"><head>
 </head>
-<body onload="setup_audio()">
-    <div class="flex-container">
-        <div id="dah" class="js_play_sound">\
-          <a href="#" class="js_play_sound" data-source="example1()">dah</a>
-        </div>
-        <div id="dit" class="js_play_sound">
-          <a href="#" class="js_stop_sound">Stop</a>
-        </div>
-      </div>
-      <p><a href="#" class="js_play_sound" data-source="example1()">Play</a>
-        <a href="#" class="js_stop_sound">Stop</a></p>
-        </body>
-</html>
-<script type="text/javascript">
-    
-    var context = new AudioContext()
-    var o = null
-    //let test = document.getElementById("dah");
-    function setup_audio(){
-      var context = new AudioContext()
-      o = context.createOscillator()
-    }
-
-
-    dah.addEventListener("mouseleave", function (event) {
-      example1()
-    }, false);
-    dah.addEventListener("mouseover", function (event) {
-      //event.target.textContent = "mouse in"
-      //console.log(isMouseHover)
-    }, false);
-        
-    dit.addEventListener("mouseleave", function (event) {
-      //isMouseHover = false
-      //event.target.textContent = "mouse out"
-      //console.log("mouse not over")
-    }, false);
-    dit.addEventListener("mouseover", function (event) {
-      //event.target.textContent = "mouse in"
-      //console.log(isMouseHover)
-    }, false);
-        
-    </script>
-
+<body>
+  <p><a href="#" class="js_play_sound" data-source="example1()">Play</a>
+        <a href="#" class="js_stop_sound">Stop</a></body>
+        </html>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script src="keyflex.js"></script>
