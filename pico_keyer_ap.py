@@ -5,7 +5,7 @@ from utime import sleep
 import uasyncio as asyncio
 #===========================cw=======================
 # setup LED
-redLED = Pin(15, Pin.OUT)
+redLED = Pin(16, Pin.OUT)
 #redLED = Pin('LED', Pin.OUT)
 
 # create needed sleep times for 10 words per minute dot = 0.12 seconds
