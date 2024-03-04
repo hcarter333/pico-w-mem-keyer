@@ -167,6 +167,20 @@ async def send_msg(msg):
     for char in msg:
         charBlinks(char)
     
+async def send_sk(cwmsg):
+    keylist = cwmsg.split(" ")
+    cw = 1
+    for pdl in keylist:
+        if cw == 1:
+            redLED.on()
+            sleep(float(pdl)/1000)
+            cw = 0
+        else:
+            redLED.off()
+            sleep(float(pdl)/1000)
+            cw = 1
+    redLED.off()
+
 ssid = 'picok'
 password = ''
 
@@ -193,11 +207,12 @@ while True:
 
         cl, addr = s.accept()
         print('client connected from', addr)
-        request = cl.recv(1024)
+        request = cl.recv(2048)
         print(request)
 
         request = str(request)
         led_on = request.find('/light/on')
+        sk_go = request.find('/light/skgo')
         led_off = request.find('/light/off')
 
         m_start = request.find('msg')
@@ -217,6 +232,14 @@ while True:
             cl.send(response)
             cl.close()
             asyncio.run(send_msg(msg))
+            led.value(1)
+            msg = ""
+        elif sk_go == 6:
+            response = webpage("0", msg)
+            cl.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
+            cl.send(response)
+            cl.close()
+            asyncio.run(send_sk(msg[:-1]))
             led.value(1)
             msg = ""
 
