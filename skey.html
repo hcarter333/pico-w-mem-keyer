@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Hover Timer with Tone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #hoverBox {
+            width: 200px;
+            height: 200px;
+            background-color: lightblue;
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #007BFF;
+            cursor: pointer;
+        }
+        #sendButton {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #sendButton:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mouse Hover Timer with Tone</h1>
+    <div id="hoverBox">Hover Over Me</div>
+    <button id="sendButton">Send</button>
+    <audio controls>
+    <source src="68441__pinkyfinger__piano-c.wav" type="audio/wav">
+    Your browser does not support the audio element.
+    </audio>
+    
+    <div id="result">
+        <!-- Processed values will appear here -->
+    </div>
+
+    <script>
+        const hoverBox = document.getElementById('hoverBox');
+        const sendButton = document.getElementById('sendButton');
+        const result = document.getElementById('result');
+
+        let hoverStartTime = 0;
+        let notHoverStartTime = 0;
+        let hoverDurations = []; // Array to store hover times
+        let notHoverDurations = []; // Array to store not hover times
+        let timerActive = false;
+        let tone = new Audio('68441__pinkyfinger__piano-c.wav', {loop: true, autoplay: true}); // Example base64 audio for middle C
+
+        tone.loop = true;
+        tone.autoplay = true;
+
+
+        hoverBox.addEventListener('mouseenter', () => {
+            if (!timerActive) {
+                hoverStartTime = Date.now();
+                console.log("entered box")
+                timerActive = true;
+                //tone = new Audio('68441__pinkyfinger__piano-c.wav'); // Example base64 audio for middle C
+                //tone.currentTime = 0; // Reset audio to start
+                tone.play(); // Play sound on hover
+            } else {
+                // Record time spent not hovering
+                hoverStartTime = Date.now();
+                const durationNotHover = Math.floor((Date.now() - notHoverStartTime)); // Convert to tenths of milliseconds
+                notHoverDurations.push(durationNotHover); // Store the duration
+                console.log("entered box")
+                tone.play(); // Play sound on hover
+            }
+        });
+
+        hoverBox.addEventListener('mouseleave', () => {
+            if (timerActive) {
+                // Record time spent hovering
+                const durationHover = Math.floor((Date.now() - hoverStartTime)); // Convert to tenths of milliseconds
+                hoverDurations.push(durationHover); // Store the duration
+                notHoverStartTime = Date.now(); // Reset not hover time
+                tone.pause(); // Stop sound on mouse leave
+                //tone.Stop();
+                tone.isPaused =true
+                //tone.currentTime = 0; // Reset audio to start
+            }
+        });
+
+        sendButton.addEventListener('click', () => {
+            if (timerActive) {
+                // Finalize the current hover time
+                const durationHover = Math.floor((Date.now() - hoverStartTime)  );
+                //hoverDurations.push(durationHover); // Store the final duration
+                timerActive = false;
+
+                // Display the results
+                result.innerHTML = `<h2>Results:</h2>
+                                    <h3>Hover Durations (tenths of milliseconds):</h3>
+                                    <p>${hoverDurations.join(', ')}</p>
+                                    <h3>Not Hover Durations (tenths of milliseconds):</h3>
+                                    <p>${notHoverDurations.join(', ')}</p>`;
+                hoverDurations = [];
+                notHoverDurations = [];
+            }
+        });
+    </script>
+</body>
+</html>
