@@ -101,17 +101,58 @@
                 const durationHover = Math.floor((Date.now() - hoverStartTime)  );
                 //hoverDurations.push(durationHover); // Store the final duration
                 timerActive = false;
+            const keyargs = [];
+            let keystring = "";
+            for (let i = 0; i < hoverDurations.length; i++) {
+                if (i < hoverDurations.length) {
+                    keyargs.push(hoverDurations[i]); // Push from hoverDurations
+                }
+                if (i < notHoverDurations.length) {
+                    keyargs.push(notHoverDurations[i]); // Push from notHoverDurations
+                }
+            }
+            //push the last keyup
+            keyargs.push(100)
+            keystring = 'http://192.168.4.1/light/skgo?msg=' + keyargs.join('+')
 
                 // Display the results
-                result.innerHTML = `<h2>Results:</h2>
-                                    <h3>Hover Durations (tenths of milliseconds):</h3>
-                                    <p>${hoverDurations.join(', ')}</p>
+                callWebAddress(keystring)
+                result.innerHTML = `<p>http://192.168.4.1/light/skgo?msg=${hoverDurations.join(', ')}</p>
                                     <h3>Not Hover Durations (tenths of milliseconds):</h3>
-                                    <p>${notHoverDurations.join(', ')}</p>`;
+                                    <p>${notHoverDurations.join(', ')}</p>
+                                    <h3>keyargs</h3>
+                                    <p>${keystring}</p>`
+                                    ;
+                keystring = ''
                 hoverDurations = [];
                 notHoverDurations = [];
             }
         });
+
+// Function to call a web address with CGI-style arguments using XMLHttpRequest
+function callWebAddress(addr) {
+    // Create a new XMLHttpRequest
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", addr, true);
+
+    // Set up a callback for when the request completes
+    xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            console.log('Success:', JSON.parse(xhr.responseText)); // Assuming the response is JSON
+            // Handle the data received from the server
+        } else {
+            console.error('Error:', xhr.statusText);
+        }
+    };
+
+    // Handle network errors
+    xhr.onerror = function () {
+        console.error('Request failed');
+    };
+
+    // Send the request
+    xhr.send();
+}
     </script>
 </body>
 </html>
