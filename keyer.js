@@ -1,4 +1,4 @@
-0// Initialize variables
+// Initialize variables
 let keydown = 0;
 let dtime = 0;
 let utime = 0;
@@ -6,8 +6,12 @@ let cwmsg = "";
 const sidetone = new Audio("sidetone.wav");
 sidetone.loop = true; // Loop the sidetone
 
+// Preload the sidetone to minimize delay
+sidetone.load();
+
 // Function to play the sidetone
 function playSidetone() {
+    sidetone.currentTime = 0; // Ensure it starts from the beginning
     sidetone.play().catch(err => console.error("Error playing sidetone:", err));
 }
 
@@ -46,7 +50,7 @@ function keyRelease() {
 // Function to send the CW message to the server
 function sendCWMessage() {
     console.log("Sending CW message: " + cwmsg);
-    fetch(`http://192.168.4.1/light/skgo?msg=${cwmsg}`, { mode: 'no-cors' })
+    fetch(`http://192.168.4.1/light/skgo?msg=${encodeURIComponent(cwmsg)}`, { mode: 'no-cors' })
         .then(() => console.log("CW message sent successfully."))
         .catch(err => console.error("Error sending CW message:", err));
 
