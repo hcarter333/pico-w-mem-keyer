@@ -13,3 +13,7 @@ Commands:
 The FT840 auto keyer:  
 ![image](https://github.com/hcarter333/pico-w-mem-keyer/assets/363004/76c67375-2dab-4599-bb34-cc3faf038c42)
 
+The straight keyer now runs in JavaScript and has a practice mode:
+
+https://github.com/user-attachments/assets/8e504a7b-ddb2-4598-a95f-efc6ba93cd30
+
