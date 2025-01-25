@@ -78,17 +78,24 @@ document.addEventListener("DOMContentLoaded", () => {
     buttonDiv.style.width = "20%";
     container.appendChild(buttonDiv);
 
-    //const button = document.createElement("button");
-    //button.id = "practiceModeButton";
-    //button.innerText = "Enable Practice Mode";
-    //button.addEventListener("click", togglePracticeMode);
-    //buttonDiv.appendChild(button);
+    const button = document.createElement("button");
+    button.id = "practiceModeButton";
+    button.innerText = "Enable Practice Mode";
+    button.addEventListener("click", togglePracticeMode);
+    buttonDiv.appendChild(button);
   
     const generateButton = document.createElement("button");
     generateButton.textContent = "Generate Histogram Image";
-    generateButton.style.marginTop = "20px";
+    //generateButton.style.marginTop = "20px";
     generateButton.addEventListener("click", combineCanvasesAndGenerateDownloadLink);
     buttonDiv.appendChild(generateButton);
+
+    // Add a button to buttonDiv that calls playKeySequence with cwmsg
+    const playSequenceButton = document.createElement("button");
+    playSequenceButton.id = "playSequenceButton";
+    playSequenceButton.innerText = "Play Key Sequence";
+    playSequenceButton.addEventListener("click", () => playKeySequence(cwmsg));
+    buttonDiv.appendChild(playSequenceButton);
 
 
     // Create title for dtime histogram
@@ -221,20 +228,6 @@ function stopSidetone() {
     //sidetone.currentTime = 0; // Reset audio playback position
     gain_node.gain.setTargetAtTime(0, 0, 0.001)
 }
-
-// Function to handle key press
-function keyPress() {
-    console.log("Key pressed");
-    if (keydown === 0) {
-        dtime = performance.now();
-        keydown = 1;
-    }
-    if(!audioResume){
-      note_context.resume();
-      audioResume = true;
-    }
-    playSidetone();
-}
   
 function combineCanvasesAndGenerateDownloadLink() {
     // Get the two canvas elements
@@ -296,24 +289,37 @@ function combineCanvasesAndGenerateDownloadLink() {
     downloadLink.textContent = "Share your Results [png]";
 }
 
+// Function to handle key press
+function keyPress() {
+    console.log("Key pressed");
+    if (keydown === 0) {
+        dtime = performance.now();
+        keydown = 1;
+    }
+    if(!audioResume){
+      note_context.resume();
+      audioResume = true;
+    }
+   if (utime !== 0) {
+        utime = performance.now() - utime;
+        console.log("Full utime: " + Math.round(utime));
+        cwmsg += Math.round(utime) + "+";
+        updateUtimeHistogram(Math.round(utime));
+    }
+    playSidetone();
+}
+
 
 // Function to handle key release
 function keyRelease() {
     console.log("Key released");
     keydown = 0;
-    const releaseTime = performance.now();
-    const currentDtime = releaseTime - dtime;
-    console.log("Full dtime: " + Math.round(currentDtime));
-    cwmsg += Math.round(currentDtime) + "+";
-    updateDtimeHistogram(Math.round(currentDtime));
+    dtime = performance.now() - dtime;
+    console.log("Full dtime: " + Math.round(dtime));
+    cwmsg += Math.round(dtime) + "+";
+    updateDtimeHistogram(Math.round(dtime));
 
-    if (utime !== 0) {
-        const currentUtime = dtime - utime;
-        console.log("Full utime: " + Math.round(currentUtime));
-        updateUtimeHistogram(Math.round(currentUtime));
-    }
-
-    utime = releaseTime;
+    utime = performance.now();
     stopSidetone();
 }
 
@@ -325,9 +331,9 @@ function sendCWMessage() {
     }
 
     console.log("Sending CW message: " + cwmsg);
-    //fetch(`http://192.168.4.1/light/skgo?msg=${cwmsg}`, { mode: 'no-cors' })
-    //    .then(() => console.log("CW message sent successfully."))
-    //    .catch(err => console.error("Error sending CW message:", err));
+    fetch(`http://192.168.4.1/light/skgo?msg=${cwmsg}`, { mode: 'no-cors' })
+        .then(() => console.log("CW message sent successfully."))
+        .catch(err => console.error("Error sending CW message:", err));
 
     cwmsg = "";
     dtime = 0;
@@ -363,6 +369,32 @@ function togglePracticeMode() {
     document.getElementById("practiceModeButton").innerText = practiceMode ? "Disable Practice Mode" : "Enable Practice Mode";
 }
   
+// Function to alternate playing the sidetone based on keyDownUp intervals
+function playKeySequence(keyDownUpString) {
+    const keyDownUp = keyDownUpString.split("+").map(Number); // Convert the string into an array of numbers
+    console.log(keyDownUpString)
+    async function playSequence() {
+        for (let i = 1; i < keyDownUp.length; i++) {
+            if (isNaN(keyDownUp[i])) continue; // Skip invalid entries
+
+            if (i % 2 === 0) {
+                // Even index: play the sidetone
+                playSidetone();
+            } else {
+                // Odd index: stop the sidetone
+                stopSidetone();
+            }
+
+            // Wait for the duration specified by the current interval
+            await new Promise(resolve => setTimeout(resolve, keyDownUp[i]));
+        }
+
+        // Ensure the sidetone is stopped after the sequence completes
+        stopSidetone();
+    }
+
+    playSequence();
+}
   
   
 
