@@ -4,17 +4,54 @@ let dtime = 0;
 let utime = 0;
 let cwmsg = "";
 let practiceMode = false;
-const sidetone = new Audio("sidetone.wav");
-sidetone.loop = true; // Loop the sidetone
+//const sidetone = new Audio("https://github.com/hcarter333/pico-w-mem-keyer/raw/refs/heads/main/sidetone.wav");
 
+const FREQUENCY = 440;
+
+var DOT_TIME = 300;
+var DASH_TIME = DOT_TIME * 3;
+var SYMBOL_BREAK = DOT_TIME;
+var LETTER_BREAK = DOT_TIME * 3;
+var WORD_BREAK = DOT_TIME * 7;
+
+
+let note_context;
+let note_node;
+let gain_node;
+
+let audioContextInitialized = false;
+let audioResume = false;
+
+async function initializeAudioContext() {
+  note_context = new AudioContext();
+  //await note_context.resume();
+  note_node = note_context.createOscillator();
+  gain_node = note_context.createGain();
+  note_node.frequency.value = FREQUENCY.toFixed(2);
+  gain_node.gain.value = 0;
+  note_node.connect(gain_node);
+  gain_node.connect(note_context.destination);
+  note_node.start();
+  audioContextInitialized = true;
+}
+                           
+
+//sidetone.loop = true; // Loop the sidetone
+//sidetone.load();
+if (!audioContextInitialized) {
+  initializeAudioContext();
+}
+
+  
 // Histogram variables
-const dtimeHistogramBins = new Array(50).fill(0); // 40 bins for 0-400ms with 10ms width
+const dtimeHistogramBins = new Array(50).fill(0); // 50 bins for 0-500ms with 10ms width
 const utimeHistogramBins = new Array(50).fill(0); // 50 bins for 0-500ms with 10ms width
 let dtimeCanvas, dtimeCtx;
 let utimeCanvas, utimeCtx;
 
 // Function to initialize the histogram canvases
 document.addEventListener("DOMContentLoaded", () => {
+    const targetDiv = document.getElementById('metdivid');
     const container = document.createElement("div");
     container.style.display = "flex";
     container.style.flexDirection = "row";
@@ -22,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     container.style.justifyContent = "center";
     container.style.gap = "20px";
     container.style.width = "100%";
-    document.body.appendChild(container);
+    targetDiv.appendChild(container);
 
     // Create a div for the histograms
     const histogramContainer = document.createElement("div");
@@ -34,17 +71,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Add practice mode button
     const buttonDiv = document.createElement("div");
+    buttonDiv.id = "buttonDiv";
     buttonDiv.style.display = "flex";
     buttonDiv.style.flexDirection = "column";
     buttonDiv.style.alignItems = "center";
     buttonDiv.style.width = "20%";
     container.appendChild(buttonDiv);
 
-    const button = document.createElement("button");
-    button.id = "practiceModeButton";
-    button.innerText = "Enable Practice Mode";
-    button.addEventListener("click", togglePracticeMode);
-    buttonDiv.appendChild(button);
+    //const button = document.createElement("button");
+    //button.id = "practiceModeButton";
+    //button.innerText = "Enable Practice Mode";
+    //button.addEventListener("click", togglePracticeMode);
+    //buttonDiv.appendChild(button);
+  
+    const generateButton = document.createElement("button");
+    generateButton.textContent = "Generate Histogram Image";
+    generateButton.style.marginTop = "20px";
+    generateButton.addEventListener("click", combineCanvasesAndGenerateDownloadLink);
+    buttonDiv.appendChild(generateButton);
+
 
     // Create title for dtime histogram
     const dtimeTitle = document.createElement("div");
@@ -165,13 +210,16 @@ function updateUtimeHistogram(utime) {
 
 // Function to play the sidetone
 function playSidetone() {
-    sidetone.play().catch(err => console.error("Error playing sidetone:", err));
+    //sidetone.currentTime = 0;
+    //sidetone.play().catch(err => console.error("Error playing sidetone:", err));
+    gain_node.gain.setTargetAtTime(0.1, 0, 0.001)
 }
 
 // Function to stop the sidetone
 function stopSidetone() {
-    sidetone.pause();
-    sidetone.currentTime = 0; // Reset audio playback position
+    //sidetone.pause();
+    //sidetone.currentTime = 0; // Reset audio playback position
+    gain_node.gain.setTargetAtTime(0, 0, 0.001)
 }
 
 // Function to handle key press
@@ -181,8 +229,73 @@ function keyPress() {
         dtime = performance.now();
         keydown = 1;
     }
+    if(!audioResume){
+      note_context.resume();
+      audioResume = true;
+    }
     playSidetone();
 }
+  
+function combineCanvasesAndGenerateDownloadLink() {
+    // Get the two canvas elements
+    const dtimeCanvas = document.getElementById("dtimeHistogramCanvas");
+    const utimeCanvas = document.getElementById("utimeHistogramCanvas");
+    const bDiv = document.getElementById('buttonDiv');
+    if (!dtimeCanvas || !utimeCanvas) {
+        console.error("Canvas elements not found.");
+        return;
+    }
+
+    // Set up labels
+    const dtimeLabel = "Dot/Dash Times";
+    const utimeLabel = "wChar/btwnChar/btwnWord Times";
+
+    // Create a new canvas to combine the two histograms and their labels
+    const combinedCanvas = document.createElement("canvas");
+    const labelHeight = 30; // Height for each label
+    combinedCanvas.width = Math.max(dtimeCanvas.width, utimeCanvas.width); // Use the larger width
+    combinedCanvas.height = dtimeCanvas.height + utimeCanvas.height + labelHeight * 2; // Combine heights with labels
+
+    const ctx = combinedCanvas.getContext("2d");
+
+    // Draw a white background
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, combinedCanvas.width, combinedCanvas.height);
+
+    // Draw the first label
+    ctx.fillStyle = "black";
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(dtimeLabel, combinedCanvas.width / 2, labelHeight - 5);
+
+    // Draw the first canvas below the label
+    ctx.drawImage(dtimeCanvas, 0, labelHeight);
+
+    // Draw the second label
+    ctx.fillText(utimeLabel, combinedCanvas.width / 2, dtimeCanvas.height + labelHeight * 2 - 5);
+
+    // Draw the second canvas below the second label
+    ctx.drawImage(utimeCanvas, 0, dtimeCanvas.height + labelHeight * 2);
+
+    // Generate a Base64-encoded PNG image from the combined canvas
+    const base64Image = combinedCanvas.toDataURL("image/png");
+
+    // Create a download link
+    let downloadLink = document.getElementById("downloadHistogramLink");
+    if (!downloadLink) {
+        downloadLink = document.createElement("a");
+        downloadLink.id = "downloadHistogramLink";
+        downloadLink.style.display = "block";
+        downloadLink.style.marginTop = "20px";
+        downloadLink.style.textAlign = "right"; // Right-align the link
+        bDiv.appendChild(downloadLink);
+    }
+
+    downloadLink.href = base64Image;
+    downloadLink.download = "combined_histogram.png"; // Default filename
+    downloadLink.textContent = "Share your Results [png]";
+}
+
 
 // Function to handle key release
 function keyRelease() {
@@ -212,9 +325,9 @@ function sendCWMessage() {
     }
 
     console.log("Sending CW message: " + cwmsg);
-    fetch(`http://192.168.4.1/light/skgo?msg=${cwmsg}`, { mode: 'no-cors' })
-        .then(() => console.log("CW message sent successfully."))
-        .catch(err => console.error("Error sending CW message:", err));
+    //fetch(`http://192.168.4.1/light/skgo?msg=${cwmsg}`, { mode: 'no-cors' })
+    //    .then(() => console.log("CW message sent successfully."))
+    //    .catch(err => console.error("Error sending CW message:", err));
 
     cwmsg = "";
     dtime = 0;
@@ -222,14 +335,19 @@ function sendCWMessage() {
     keydown = 0;
 }
 
-// Event listener for key presses and releases
 document.addEventListener("keydown", event => {
-    if (event.key !== "Escape") {
-        if (keydown === 0) keyPress();
+    if (event.key === "Alt" || event.key === "Tab") {
+        return; // Ignore Alt and Tab keys
+    }
+    if (event.key !== "Escape" && keydown === 0) {
+        keyPress();
     }
 });
 
 document.addEventListener("keyup", event => {
+    if (event.key === "Alt" || event.key === "Tab") {
+        return; // Ignore Alt and Tab keys
+    }
     if (event.key !== "Escape") {
         keyRelease();
     } else {
@@ -237,7 +355,6 @@ document.addEventListener("keyup", event => {
         sendCWMessage();
     }
 });
-
 // Function to toggle practice mode
 function togglePracticeMode() {
     practiceMode = !practiceMode;
@@ -245,6 +362,9 @@ function togglePracticeMode() {
     console.log(`Practice mode ${status}.`);
     document.getElementById("practiceModeButton").innerText = practiceMode ? "Disable Practice Mode" : "Enable Practice Mode";
 }
+  
+  
+  
 
 // Main function
 function main() {
@@ -252,3 +372,4 @@ function main() {
 }
 
 main();
+  
