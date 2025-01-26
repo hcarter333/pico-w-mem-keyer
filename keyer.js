@@ -374,7 +374,7 @@ function playKeySequence(keyDownUpString) {
     const keyDownUp = keyDownUpString.split("+").map(Number); // Convert the string into an array of numbers
     console.log(keyDownUpString)
     async function playSequence() {
-        for (let i = 1; i < keyDownUp.length; i++) {
+        for (let i = 0; i < keyDownUp.length; i++) {
             if (isNaN(keyDownUp[i])) continue; // Skip invalid entries
 
             if (i % 2 === 0) {
