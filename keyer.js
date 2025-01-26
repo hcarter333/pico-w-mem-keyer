@@ -45,10 +45,14 @@ async function connectToSerialPort() {
 }
 
 async function listenToSerialPort() {
-    const signals = await serialPort.getSignals();
+    signals = await serialPort.getSignals();
     while (serialPort.readable) {
-        const currentCTS = signals.clearToSend;
-
+        signals = await serialPort.getSignals();
+        currentCTS = signals.clearToSend;
+console.log(`Clear To Send:       ${signals.clearToSend}`);
+console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`);
+console.log(`Data Set Ready:      ${signals.dataSetReady}`);
+console.log(`Ring Indicator:      ${signals.ringIndicator}`);
         if (currentCTS !== prevCTS) {
             if (currentCTS) {
                 keyPress();
@@ -57,9 +61,9 @@ async function listenToSerialPort() {
             }
             prevCTS = currentCTS;
         }
-        //console.log("reading serial")
+        console.log("reading serial =================")
         // Allow small delay to prevent CPU hogging
-        await new Promise(resolve => setTimeout(resolve, 1));
+        await new Promise(resolve => setTimeout(resolve, 10));
     }
 }
 
