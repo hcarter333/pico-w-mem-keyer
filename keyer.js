@@ -22,6 +22,49 @@ let gain_node;
 let audioContextInitialized = false;
 let audioResume = false;
 
+let serialPort = null; // Serial port instance
+let reader = null; // Stream reader
+let prevCTS = null;
+
+async function connectToSerialPort() {
+    try {
+        // Request user to select a serial port
+        serialPort = await navigator.serial.requestPort();
+        await serialPort.open({ baudRate: 9600 }); // Adjust baud rate as needed
+        console.log("Serial port connected.");
+
+        // Get signals object to read the CTS status
+        const signals = await serialPort.getSignals();
+        prevCTS = signals.clearToSend;
+
+        listenToSerialPort();
+    } catch (err) {
+        console.error("Failed to open serial port:", err);
+        serialPort = null;
+    }
+}
+
+async function listenToSerialPort() {
+    const signals = await serialPort.getSignals();
+    while (serialPort.readable) {
+        const currentCTS = signals.clearToSend;
+
+        if (currentCTS !== prevCTS) {
+            if (currentCTS) {
+                keyPress();
+            } else {
+                keyRelease();
+            }
+            prevCTS = currentCTS;
+        }
+        //console.log("reading serial")
+        // Allow small delay to prevent CPU hogging
+        await new Promise(resolve => setTimeout(resolve, 1));
+    }
+}
+
+
+
 async function initializeAudioContext() {
   note_context = new AudioContext();
   //await note_context.resume();
@@ -362,7 +405,15 @@ document.addEventListener("keyup", event => {
     }
 });
 // Function to toggle practice mode
-function togglePracticeMode() {
+async function togglePracticeMode() {
+    if (!("serial" in navigator)) {
+        alert("Web Serial API is not supported in this browser.");
+        return;
+    }
+
+    // Connect to the serial port
+    await connectToSerialPort();
+
     practiceMode = !practiceMode;
     const status = practiceMode ? "enabled" : "disabled";
     console.log(`Practice mode ${status}.`);
@@ -399,8 +450,8 @@ function playKeySequence(keyDownUpString) {
   
 
 // Main function
-function main() {
-    console.log("Press keys to generate CW messages. Press Escape to send the message.");
+async function main() {
+        console.log("Press keys to generate CW messages. Press Escape to send the message.");
 }
 
 main();
