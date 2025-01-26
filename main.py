@@ -8,8 +8,10 @@ import uasyncio as asyncio
 redLED = Pin(16, Pin.OUT)
 power_on = Pin(17, Pin.OUT)
 power_off = Pin(18, Pin.OUT)
-keyPin = Pin(15, Pin.IN, Pin.PULL_UP)  # Assuming the switch is on GPIO 15
-keyOffPin = Pin(14, Pin.IN, Pin.PULL_UP)  # Assuming the switch is on GPIO 15
+
+ssid = 'picok'
+password = 'your_passwd'
+
 
 # create needed sleep times for 10 words per minute dot = 0.12 seconds
 # 5 words per minute is 0.24 seconds
@@ -71,9 +73,6 @@ def charBlinks(char):
         # for a space, we need to sleep "betWord - 3*dot" since the blinking code always sleeps
         # betChar (=3*dot) at the end of each character
         sleep(betWord - 3*dot)
-    if char == 'K':
-        serverOn = False
-        return
     if char == 'P':
         power_on.on()
         sleep(8*dot)
@@ -193,6 +192,7 @@ async def send_sk(cwmsg):
     for pdl in keylist:
         if cw == 1:
             redLED.on()
+            #print("message is " + pdl)
             if float(pdl) > 2000:
                pdl = "2000" 
             sleep(float(pdl)/1000)
@@ -207,23 +207,6 @@ async def send_sk(cwmsg):
 
 
 
-async def monitorKey():
-    global serverOn
-    print("entered monitorKey")
-    while True:
-        if keyOffPin.value() == 0:
-            print("stopping straight key")
-            serverOn = True
-            return
-        if serverOn == False:
-            print("waiting on key")
-            if keyPin.value() == 0:  # Assuming LOW when key is pressed (active-low)
-                redLED.on()  # Turn on LED when key is pressed
-                print("key down")
-            else:
-                redLED.off()  # Turn off LED when key is released
-        await asyncio.sleep(0.01)  # Small delay to debounce and prevent rapid polling
-
 # Listen for connections
 async def serverloop():
     global serverOn
@@ -234,10 +217,25 @@ async def serverloop():
                 print("waiting for accept")
                 cl, addr = s.accept()
                 print('client connected from', addr)
-                request = cl.recv(2048) 
-                print(request)
+                data = list()
+                data.append(cl.recv(4096))
+                testmsg = str(b''.join(data))
+                data_end = True
+                if testmsg.find('HTTP') == -1:
+                    data_end = False
+                while not data_end:
+                    #request = cl.recv(4096)
+                    data.append(cl.recv(4096))
+                    testmsg = str(b''.join(data))
+                    #Excprint(str(len(data)))
+                    if testmsg.find('HTTP'):
+                        data_end = True
+                request = b''.join(data)
+                #print(request)
+                print("length ", str(len(request)))
 
                 request = str(request)
+                print("length ", str(len(request)))
                 led_on = request.find('/light/on')
                 sk_go = request.find('/light/skgo')
                 led_off = request.find('/light/off')
@@ -281,25 +279,22 @@ async def serverloop():
     
 async def main():
     # Create a background task for monitorKey and run it
-    while True:
-        task_server = asyncio.create_task(serverloop())
-        task_mon = asyncio.create_task(monitorKey())
+    #while True:
+    task_server = asyncio.create_task(serverloop())
+        #task_mon = asyncio.create_task(monitorKey())
 
 # The main loop for other tasks can go here. 
     # You can add other async tasks that need to run in parallel with monitorKey.
     #while True:
     #    await asyncio.sleep(1)  # Keep the main loop running and allow other tasks to run.
-        await task_server
-        await task_mon
-        await asyncio.sleep(0.1)  # Small delay to debounce and prevent rapid polling
+    await task_server
+        #await task_mon
+    #await asyncio.sleep(0.1)  # Small delay to debounce and prevent rapid polling
 
 
 
 
 
-
-ssid = ''
-password = ''
 
 
 
@@ -322,5 +317,4 @@ s.listen(5)
 asyncio.run(send_msg("c"))
 
 asyncio.run(main())
-
 
