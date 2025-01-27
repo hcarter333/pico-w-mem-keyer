@@ -49,10 +49,10 @@ async function listenToSerialPort() {
     while (serialPort.readable) {
         signals = await serialPort.getSignals();
         currentCTS = signals.clearToSend;
-console.log(`Clear To Send:       ${signals.clearToSend}`);
-console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`);
-console.log(`Data Set Ready:      ${signals.dataSetReady}`);
-console.log(`Ring Indicator:      ${signals.ringIndicator}`);
+//console.log(`Clear To Send:       ${signals.clearToSend}`);
+//console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`);
+//console.log(`Data Set Ready:      ${signals.dataSetReady}`);
+//console.log(`Ring Indicator:      ${signals.ringIndicator}`);
         if (currentCTS !== prevCTS) {
             if (currentCTS) {
                 keyPress();
@@ -61,7 +61,7 @@ console.log(`Ring Indicator:      ${signals.ringIndicator}`);
             }
             prevCTS = currentCTS;
         }
-        console.log("reading serial =================")
+//        console.log("reading serial =================")
         // Allow small delay to prevent CPU hogging
         await new Promise(resolve => setTimeout(resolve, 10));
     }
@@ -130,6 +130,12 @@ document.addEventListener("DOMContentLoaded", () => {
     button.innerText = "Enable Practice Mode";
     button.addEventListener("click", togglePracticeMode);
     buttonDiv.appendChild(button);
+  
+    const halikeyButton = document.createElement("button");
+    halikeyButton.id = "startHalikey";
+    halikeyButton.innerText = "Start Halikey";
+    halikeyButton.addEventListener("click", toggleHalikey);
+    buttonDiv.appendChild(halikeyButton);
   
     const generateButton = document.createElement("button");
     generateButton.textContent = "Generate Histogram Image";
@@ -409,7 +415,15 @@ document.addEventListener("keyup", event => {
     }
 });
 // Function to toggle practice mode
-async function togglePracticeMode() {
+function togglePracticeMode() {
+    practiceMode = !practiceMode;
+    const status = practiceMode ? "enabled" : "disabled";
+    console.log(`Practice mode ${status}.`);
+    document.getElementById("practiceModeButton").innerText = practiceMode ? "Disable Practice Mode" : "Enable Practice Mode";
+}
+
+//Function to enable hw key
+async function toggleHalikey() {
     if (!("serial" in navigator)) {
         alert("Web Serial API is not supported in this browser.");
         return;
@@ -418,11 +432,15 @@ async function togglePracticeMode() {
     // Connect to the serial port
     await connectToSerialPort();
 
-    practiceMode = !practiceMode;
-    const status = practiceMode ? "enabled" : "disabled";
-    console.log(`Practice mode ${status}.`);
+    if(!audioResume){
+      note_context.resume();
+      audioResume = true;
+    }
+
+
     document.getElementById("practiceModeButton").innerText = practiceMode ? "Disable Practice Mode" : "Enable Practice Mode";
 }
+
   
 // Function to alternate playing the sidetone based on keyDownUp intervals
 function playKeySequence(keyDownUpString) {
