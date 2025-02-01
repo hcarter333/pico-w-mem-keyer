@@ -11,6 +11,7 @@
       padding: 0;
       background-color: black;
       color: #F5C710;
+      overflow: hidden; /* Prevent body scroll since our content div will scroll */
     }
     a, h1, h2, h3, h4, h5, h6, p, label, input, button, textarea, legend {
       color: #F5C710;
@@ -19,33 +20,39 @@
       border: 3px solid #F5C710;
       border-radius: 10px;
     }
-    /* Fixed Header */
-    header {
+    /* Fixed Banner */
+    #banner {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
+      background-color: black;
+      padding: 15px;
       z-index: 1000;
       text-align: center;
-      padding: 15px;
-      background-color: black;
     }
-    header img {
+    #banner img {
       max-width: 100%;
       height: auto;
       display: block;
       margin: 0 auto;
     }
-    /* Content container to offset fixed header */
-    .content {
-      margin-top: 130px; /* Adjust this value if your header height changes */
+    /* Content Container: fills remaining space and scrolls */
+    #content {
+      position: absolute;
+      top: 130px; /* Adjust this value if you change the banner height */
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      padding: 15px;
+      box-sizing: border-box;
     }
     /* Top Sections: Station Setup and Auto Keyer side by side */
     #topSections {
       display: flex;
       gap: 15px;
-      padding: 15px;
-      box-sizing: border-box;
+      margin-bottom: 15px;
     }
     #topSections > section {
       flex: 1;
@@ -55,8 +62,8 @@
     section {
       border-bottom: 3px solid #F5C710;
       padding: 15px;
-      width: 100%;
       box-sizing: border-box;
+      margin-bottom: 15px;
     }
     fieldset {
       margin-bottom: 10px;
@@ -107,13 +114,11 @@
     .inline-group label {
       margin-right: 5px;
     }
-    /* Bottom Container: Two Columns, with equal height */
+    /* Bottom Container: Two Columns, equal height */
     #bottomContainer {
       display: flex;
       gap: 15px;
-      padding: 15px;
-      box-sizing: border-box;
-      align-items: stretch;
+      margin-bottom: 15px;
     }
     #leftColumn, #rightColumn {
       flex: 1;
@@ -124,7 +129,7 @@
       padding: 15px;
       box-sizing: border-box;
     }
-    /* Right Column: will stretch to match left column */
+    /* Right Column: SDR and RBN Panels */
     #rightColumn {
       border: 3px solid #F5C710;
       border-radius: 10px;
@@ -132,6 +137,7 @@
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
+      /* Let it stretch naturally to match left column height */
     }
     /* SDR Panel: fixed height of 200px */
     .sdr-container {
@@ -154,7 +160,7 @@
     }
     /* (Optional) Iframes Section */
     #iframesSection {
-      padding: 15px;
+      margin-bottom: 15px;
     }
     #iframesSection iframe {
       width: 100%;
@@ -165,11 +171,11 @@
   </style>
 </head>
 <body>
-  <header class="box-border">
+  <div id="banner" class="box-border">
     <img src="toucs_web_station.jpg" alt="TouCans Web Station Banner">
-  </header>
-
-  <div class="content">
+  </div>
+  
+  <div id="content">
     <!-- Top Sections: Station Setup and Auto Keyer -->
     <div id="topSections">
       <!-- Station Setup -->
