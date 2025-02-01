@@ -19,15 +19,26 @@
       border: 3px solid #F5C710;
       border-radius: 10px;
     }
+    /* Fixed header */
     header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
       text-align: center;
       padding: 15px;
+      background-color: black; /* same as body background */
     }
     header img {
       max-width: 100%;
       height: auto;
       display: block;
       margin: 0 auto;
+    }
+    /* Main content container to push content below fixed header */
+    .content {
+      margin-top: 100px; /* adjust this value if your header's height changes */
     }
     /* Top Sections: Station Setup and Auto Keyer side by side */
     #topSections {
@@ -158,115 +169,117 @@
     <img src="toucs_web_station.jpg" alt="TouCans Web Station Banner">
   </header>
 
-  <!-- Top Sections: Station Setup and Auto Keyer -->
-  <div id="topSections">
-    <!-- Station Setup -->
-    <section id="stationSetup" class="box-border">
-      <h2>Station Setup</h2>
-      <div>
-        <label for="inetAddress">TouCans Inet Address:</label>
-        <input type="text" id="inetAddress" placeholder="e.g., 192.168.1.100">
-      </div>
-      <fieldset class="box-border">
-        <legend>TouCans World Location</legend>
+  <div class="content">
+    <!-- Top Sections: Station Setup and Auto Keyer -->
+    <div id="topSections">
+      <!-- Station Setup -->
+      <section id="stationSetup" class="box-border">
+        <h2>Station Setup</h2>
         <div>
-          <label for="longitude">Longitude:</label>
-          <input type="text" id="longitude">
+          <label for="inetAddress">TouCans Inet Address:</label>
+          <input type="text" id="inetAddress" placeholder="e.g., 192.168.1.100">
         </div>
-        <div>
-          <label for="latitude">Latitude:</label>
-          <input type="text" id="latitude">
-        </div>
-        <div>
-          <label for="tx_qth">tx_state:</label>
-          <input type="text" id="tx_qth">
-        </div>
-        <div>
-          <label for="utc_offset">UTC offset:</label>
-          <input type="number" id="utc_offset" value="0">
-        </div>
-      </fieldset>
-    </section>
-
-    <!-- Auto Keyer -->
-    <section id="autoKeyer" class="box-border">
-      <h2>Auto Keyer</h2>
-      <div>
-        <label for="keyer_message">Keyer message:</label>
-        <input type="text" id="keyer_message">
-      </div>
-      <div>
-        <label for="rpt_secs">Repeat message every x seconds:</label>
-        <input type="number" id="rpt_secs" value="5">
-      </div>
-      <div>
-        <button id="startKeyer">Start</button>
-        <button id="stopKeyer">Stop</button>
-      </div>
-    </section>
-  </div>
-
-  <!-- Bottom Container: Two Columns -->
-  <div id="bottomContainer">
-    <!-- Left Column: Custom Message and POTA/SOTA -->
-    <div id="leftColumn">
-      <!-- Custom Message -->
-      <section id="customMsg" class="box-border">
-        <h2>Custom Message</h2>
-        <div>
-          <label for="cust_msg">Message to send:</label>
-          <input type="text" id="cust_msg">
-        </div>
-        <div>
-          <button id="sendCustMsg">Send</button>
-        </div>
+        <fieldset class="box-border">
+          <legend>TouCans World Location</legend>
+          <div>
+            <label for="longitude">Longitude:</label>
+            <input type="text" id="longitude">
+          </div>
+          <div>
+            <label for="latitude">Latitude:</label>
+            <input type="text" id="latitude">
+          </div>
+          <div>
+            <label for="tx_qth">tx_state:</label>
+            <input type="text" id="tx_qth">
+          </div>
+          <div>
+            <label for="utc_offset">UTC offset:</label>
+            <input type="number" id="utc_offset" value="0">
+          </div>
+        </fieldset>
       </section>
-      <!-- POTA/SOTA -->
-      <section id="potaSota" class="box-border">
-        <h2>POTA/SOTA</h2>
-        <div class="inline-group">
-          <div>
-            <label for="tx_call">Call:</label>
-            <input type="text" id="tx_call">
-          </div>
-          <div>
-            <label for="tx_rst">rst:</label>
-            <input type="text" id="tx_rst">
-          </div>
+
+      <!-- Auto Keyer -->
+      <section id="autoKeyer" class="box-border">
+        <h2>Auto Keyer</h2>
+        <div>
+          <label for="keyer_message">Keyer message:</label>
+          <input type="text" id="keyer_message">
         </div>
         <div>
-          <button id="startPota">Start POTA</button>
-        </div>
-        <div class="inline-group">
-          <div>
-            <label for="rx_rst">rx_rst:</label>
-            <input type="text" id="rx_rst">
-          </div>
-          <div>
-            <label for="rx_qth">rx_qth:</label>
-            <input type="text" id="rx_qth">
-          </div>
+          <label for="rpt_secs">Repeat message every x seconds:</label>
+          <input type="number" id="rpt_secs" value="5">
         </div>
         <div>
-          <button id="endAndLog">End and Log</button>
-        </div>
-        <div>
-          <label for="logArea">Log:</label><br>
-          <textarea id="logArea" readonly></textarea>
+          <button id="startKeyer">Start</button>
+          <button id="stopKeyer">Stop</button>
         </div>
       </section>
     </div>
 
-    <!-- Right Column: SDR and RBN Panels -->
-    <div id="rightColumn" class="box-border">
-      <h2>SDR and RBN</h2>
-      <!-- SDR Panel (200px tall) -->
-      <div class="sdr-container">
-        <iframe id="sdrIframeColumn" src="http://websdr2.sdrutah.org:8902/index1a.html?tune=14059lsb&zoom=5#html5choice" title="Web SDR Waterfall"></iframe>
+    <!-- Bottom Container: Two Columns -->
+    <div id="bottomContainer">
+      <!-- Left Column: Custom Message and POTA/SOTA -->
+      <div id="leftColumn">
+        <!-- Custom Message -->
+        <section id="customMsg" class="box-border">
+          <h2>Custom Message</h2>
+          <div>
+            <label for="cust_msg">Message to send:</label>
+            <input type="text" id="cust_msg">
+          </div>
+          <div>
+            <button id="sendCustMsg">Send</button>
+          </div>
+        </section>
+        <!-- POTA/SOTA -->
+        <section id="potaSota" class="box-border">
+          <h2>POTA/SOTA</h2>
+          <div class="inline-group">
+            <div>
+              <label for="tx_call">Call:</label>
+              <input type="text" id="tx_call">
+            </div>
+            <div>
+              <label for="tx_rst">rst:</label>
+              <input type="text" id="tx_rst">
+            </div>
+          </div>
+          <div>
+            <button id="startPota">Start POTA</button>
+          </div>
+          <div class="inline-group">
+            <div>
+              <label for="rx_rst">rx_rst:</label>
+              <input type="text" id="rx_rst">
+            </div>
+            <div>
+              <label for="rx_qth">rx_qth:</label>
+              <input type="text" id="rx_qth">
+            </div>
+          </div>
+          <div>
+            <button id="endAndLog">End and Log</button>
+          </div>
+          <div>
+            <label for="logArea">Log:</label><br>
+            <textarea id="logArea" readonly></textarea>
+          </div>
+        </section>
       </div>
-      <!-- RBN Panel: occupies remaining space -->
-      <div class="rbn-container">
-        <iframe src="https://www.reversebeacon.net/main.php?zoom=41.09,-42.18,2.45&rows=100&max_age=30,minutes&bands=20&spotted_call=Kd0f*&hide=distance_km#mapdiv" title="Reverse Beacon"></iframe>
+
+      <!-- Right Column: SDR and RBN Panels -->
+      <div id="rightColumn" class="box-border">
+        <h2>SDR and RBN</h2>
+        <!-- SDR Panel (200px tall) -->
+        <div class="sdr-container">
+          <iframe id="sdrIframeColumn" src="http://websdr2.sdrutah.org:8902/index1a.html?tune=14059lsb&zoom=5#html5choice" title="Web SDR Waterfall"></iframe>
+        </div>
+        <!-- RBN Panel: occupies remaining space -->
+        <div class="rbn-container">
+          <iframe src="https://www.reversebeacon.net/main.php?zoom=41.09,-42.18,2.45&rows=100&max_age=30,minutes&bands=20&spotted_call=Kd0f*&hide=distance_km#mapdiv" title="Reverse Beacon"></iframe>
+        </div>
       </div>
     </div>
   </div>
