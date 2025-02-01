@@ -9,8 +9,8 @@ redLED = Pin(16, Pin.OUT)
 power_on = Pin(17, Pin.OUT)
 power_off = Pin(18, Pin.OUT)
 
-ssid = 'picok'
-password = 'your_passwd'
+ssid = 'yourserve'
+password = 'yourpassword'
 
 
 # create needed sleep times for 10 words per minute dot = 0.12 seconds
@@ -301,14 +301,34 @@ async def main():
 
 
 # Just making our internet connection
-ap = network.WLAN(network.AP_IF)
-ap.config(essid=ssid, password=password)
-ap.active(True)  
+#ap = network.WLAN(network.AP_IF)
+#ap.config(essid=ssid, password=password)
+#ap.active(True)  
     
-while ap.active() == False:
-    pass
-print('AP Mode Is Active, You can Now Connect')
-print('IP Address To Connect to:: ' + ap.ifconfig()[0])
+#while ap.active() == False:
+#    pass
+#print('AP Mode Is Active, You can Now Connect')
+#print('IP Address To Connect to:: ' + ap.ifconfig()[0])
+ap = network.WLAN(network.STA_IF)
+ap.active(True)
+ap.connect("krypto", "krypto3lefty")
+
+max_wait = 10
+while max_wait > 0:
+    if wlan.isconnected():
+        break
+    time.sleep(1)
+    max_wait -= 1
+    print("Waiting for connection...")
+
+if wlan.isconnected():
+    print("Connected!")
+    ip, subnet, gateway, dns = wlan.ifconfig()
+    print("IP address:", ip)
+else:
+    print("Failed to connect to Wi‑Fi.")
+
+
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
