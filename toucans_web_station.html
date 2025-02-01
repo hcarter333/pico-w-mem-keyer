@@ -4,26 +4,52 @@
   <meta charset="UTF-8">
   <title>TouCans Web Station</title>
   <style>
+    /* Global Styles */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      background-color: black;
+      color: #F5C710;
+    }
+    a, h1, h2, h3, h4, h5, h6, p, label, input, button, textarea, legend {
+      color: #F5C710;
+    }
+    .box-border {
+      border: 3px solid #F5C710;
+      border-radius: 10px;
     }
     header {
-      background-color: #4CAF50;
-      color: white;
-      padding: 15px;
       text-align: center;
-      font-size: 1.5em;
+      padding: 15px;
+    }
+    header img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+    /* Top Sections: Station Setup and Auto Keyer side by side */
+    #topSections {
+      display: flex;
+      gap: 15px;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    #topSections > section {
+      flex: 1;
+      padding: 15px;
+      box-sizing: border-box;
     }
     section {
-      border-bottom: 1px solid #ccc;
+      border-bottom: 3px solid #F5C710;
       padding: 15px;
       width: 100%;
       box-sizing: border-box;
     }
     fieldset {
       margin-bottom: 10px;
+      padding: 10px;
     }
     legend {
       font-weight: bold;
@@ -33,8 +59,14 @@
       margin-top: 5px;
     }
     input[type="text"],
-    input[type="number"] {
+    input[type="number"],
+    textarea {
       margin-top: 5px;
+      background-color: #222;
+      color: #F5C710;
+      border: 2px solid #F5C710;
+      border-radius: 5px;
+      padding: 5px;
     }
     textarea {
       width: 100%;
@@ -43,8 +75,14 @@
     button {
       margin-top: 10px;
       margin-right: 10px;
+      background-color: #222;
+      color: #F5C710;
+      border: 2px solid #F5C710;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
     }
-    /* Style to arrange items inline */
+    /* Inline grouping */
     .inline-group {
       display: flex;
       align-items: center;
@@ -58,121 +96,198 @@
     .inline-group label {
       margin-right: 5px;
     }
+    /* Bottom Container: Two Columns, with equal height */
+    #bottomContainer {
+      display: flex;
+      gap: 15px;
+      padding: 15px;
+      box-sizing: border-box;
+      align-items: stretch;
+    }
+    #leftColumn, #rightColumn {
+      flex: 1;
+    }
+    #leftColumn {
+      border: 3px solid #F5C710;
+      border-radius: 10px;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    /* Right Column: no fixed height; it will stretch to match left column */
+    #rightColumn {
+      border: 3px solid #F5C710;
+      border-radius: 10px;
+      padding: 15px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+    /* SDR Panel: fixed height of 200px */
+    .sdr-container {
+      height: 200px;
+      margin-bottom: 10px;
+    }
+    .sdr-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    /* RBN Panel: fills remaining space in right column */
+    .rbn-container {
+      flex: 1;
+    }
+    .rbn-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    /* (Optional) Iframes Section */
+    #iframesSection {
+      padding: 15px;
+    }
+    #iframesSection iframe {
+      width: 100%;
+      height: 300px;
+      border: 3px solid #F5C710;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
-  <header>TouCans Web Station</header>
+  <header class="box-border">
+    <img src="toucs_web_station.jpg" alt="TouCans Web Station Banner">
+  </header>
 
-  <!-- Section 1: Station Setup -->
-  <section id="stationSetup">
-    <h2>Station Setup</h2>
-    <div>
-      <label for="inetAddress">TouCans Inet Address:</label>
-      <input type="text" id="inetAddress" placeholder="e.g., 192.168.1.100">
-    </div>
-    <fieldset>
-      <legend>TouCans World Location</legend>
+  <!-- Top Sections: Station Setup and Auto Keyer -->
+  <div id="topSections">
+    <!-- Station Setup -->
+    <section id="stationSetup" class="box-border">
+      <h2>Station Setup</h2>
       <div>
-        <label for="longitude">Longitude:</label>
-        <input type="text" id="longitude">
+        <label for="inetAddress">TouCans Inet Address:</label>
+        <input type="text" id="inetAddress" placeholder="e.g., 192.168.1.100">
       </div>
-      <div>
-        <label for="latitude">Latitude:</label>
-        <input type="text" id="latitude">
-      </div>
-      <div>
-        <label for="tx_qth">tx_state:</label>
-        <!-- Stored in variable tx_qth -->
-        <input type="text" id="tx_qth">
-      </div>
-      <div>
-        <label for="utc_offset">UTC offset:</label>
-        <input type="number" id="utc_offset" value="0">
-      </div>
-    </fieldset>
-  </section>
+      <fieldset class="box-border">
+        <legend>TouCans World Location</legend>
+        <div>
+          <label for="longitude">Longitude:</label>
+          <input type="text" id="longitude">
+        </div>
+        <div>
+          <label for="latitude">Latitude:</label>
+          <input type="text" id="latitude">
+        </div>
+        <div>
+          <label for="tx_qth">tx_state:</label>
+          <input type="text" id="tx_qth">
+        </div>
+        <div>
+          <label for="utc_offset">UTC offset:</label>
+          <input type="number" id="utc_offset" value="0">
+        </div>
+      </fieldset>
+    </section>
 
-  <!-- Section 2: Auto Keyer -->
-  <section id="autoKeyer">
-    <h2>Auto Keyer</h2>
-    <div>
-      <label for="keyer_message">Keyer message:</label>
-      <input type="text" id="keyer_message">
-    </div>
-    <div>
-      <label for="rpt_secs">Repeat message every x seconds:</label>
-      <input type="number" id="rpt_secs" value="5">
-    </div>
-    <div>
-      <button id="startKeyer">Start</button>
-      <button id="stopKeyer">Stop</button>
-    </div>
-  </section>
+    <!-- Auto Keyer -->
+    <section id="autoKeyer" class="box-border">
+      <h2>Auto Keyer</h2>
+      <div>
+        <label for="keyer_message">Keyer message:</label>
+        <input type="text" id="keyer_message">
+      </div>
+      <div>
+        <label for="rpt_secs">Repeat message every x seconds:</label>
+        <input type="number" id="rpt_secs" value="5">
+      </div>
+      <div>
+        <button id="startKeyer">Start</button>
+        <button id="stopKeyer">Stop</button>
+      </div>
+    </section>
+  </div>
 
-  <!-- Section 3: Custom Message -->
-  <section id="customMsg">
-    <h2>Custom Message</h2>
-    <div>
-      <label for="cust_msg">Message to send:</label>
-      <input type="text" id="cust_msg">
+  <!-- Bottom Container: Two Columns -->
+  <div id="bottomContainer">
+    <!-- Left Column: Custom Message and POTA/SOTA -->
+    <div id="leftColumn">
+      <!-- Custom Message -->
+      <section id="customMsg" class="box-border">
+        <h2>Custom Message</h2>
+        <div>
+          <label for="cust_msg">Message to send:</label>
+          <input type="text" id="cust_msg">
+        </div>
+        <div>
+          <button id="sendCustMsg">Send</button>
+        </div>
+      </section>
+      <!-- POTA/SOTA -->
+      <section id="potaSota" class="box-border">
+        <h2>POTA/SOTA</h2>
+        <div class="inline-group">
+          <div>
+            <label for="tx_call">Call:</label>
+            <input type="text" id="tx_call">
+          </div>
+          <div>
+            <label for="tx_rst">rst:</label>
+            <input type="text" id="tx_rst">
+          </div>
+        </div>
+        <div>
+          <button id="startPota">Start POTA</button>
+        </div>
+        <div class="inline-group">
+          <div>
+            <label for="rx_rst">rx_rst:</label>
+            <input type="text" id="rx_rst">
+          </div>
+          <div>
+            <label for="rx_qth">rx_qth:</label>
+            <input type="text" id="rx_qth">
+          </div>
+        </div>
+        <div>
+          <button id="endAndLog">End and Log</button>
+        </div>
+        <div>
+          <label for="logArea">Log:</label><br>
+          <textarea id="logArea" readonly></textarea>
+        </div>
+      </section>
     </div>
-    <div>
-      <button id="sendCustMsg">Send</button>
-    </div>
-  </section>
 
-  <!-- Section 4: POTA/SOTA -->
-  <section id="potaSota">
-    <h2>POTA/SOTA</h2>
-    <!-- Group the Call and rst inputs on the same line -->
-    <div class="inline-group">
-      <div>
-        <label for="tx_call">Call:</label>
-        <input type="text" id="tx_call">
+    <!-- Right Column: SDR and RBN Panels -->
+    <div id="rightColumn" class="box-border">
+      <h2>SDR and RBN</h2>
+      <!-- SDR Panel (200px tall) -->
+      <div class="sdr-container">
+        <iframe id="sdrIframeColumn" src="http://websdr2.sdrutah.org:8902/index1a.html?tune=14059lsb&zoom=5#html5choice" title="Web SDR Waterfall"></iframe>
       </div>
-      <div>
-        <label for="tx_rst">rst:</label>
-        <input type="text" id="tx_rst">
+      <!-- RBN Panel: occupies remaining space -->
+      <div class="rbn-container">
+        <iframe src="https://www.reversebeacon.net/main.php?zoom=41.09,-42.18,2.45&rows=100&max_age=30,minutes&bands=20&spotted_call=Kd0f*&hide=distance_km#mapdiv" title="Reverse Beacon"></iframe>
       </div>
     </div>
-    <div>
-      <button id="startPota">Start POTA</button>
-    </div>
-    <!-- Group the rx_rst and rx_qth inputs on the same line -->
-    <div class="inline-group">
-      <div>
-        <label for="rx_rst">rx_rst:</label>
-        <input type="text" id="rx_rst">
-      </div>
-      <div>
-        <label for="rx_qth">rx_qth:</label>
-        <input type="text" id="rx_qth">
-      </div>
-    </div>
-    <div>
-      <button id="endAndLog">End and Log</button>
-    </div>
-    <div>
-      <label for="logArea">Log:</label><br>
-      <textarea id="logArea" readonly></textarea>
-    </div>
-  </section>
+  </div>
 
   <script>
     // Global variables
     let keyerInterval = null;
     let qso_time = null;  // Will hold the local time (adjusted) for POTA/SOTA
 
-    // Helper function to send a message using fetch GET request with no-cors mode
+    // Helper function to send a message using fetch GET request with no-cors mode.
+    // This function replaces spaces in msg with '+'.
     function sendMessage(msg) {
       const inetAddress = document.getElementById('inetAddress').value.trim();
       if (!inetAddress) {
         alert("Please enter the TouCans Inet Address in the Station Setup section.");
         return;
       }
+      // Replace all whitespace with '+'
+      msg = msg.replace(/\s+/g, '+');
       const url = `http://${inetAddress}/light/on?msg=${msg}`;
       console.log("Sending message:", msg, "to URL:", url);
-      // Use fetch with no-cors mode
       fetch(url, { mode: 'no-cors' })
         .then(() => console.log("CW message sent successfully."))
         .catch(err => console.error("Error sending CW message:", err));
@@ -216,11 +331,9 @@
         alert("Please enter a valid number for repeat seconds.");
         return;
       }
-      // Clear any previous interval
       if (keyerInterval !== null) {
         clearInterval(keyerInterval);
       }
-      // Start sending message every rptSecs seconds
       keyerInterval = setInterval(() => {
         sendMessage(keyerMsg);
       }, rptSecs * 1000);
@@ -249,46 +362,32 @@
     document.getElementById('startPota').addEventListener('click', function() {
       const tx_call = document.getElementById('tx_call').value;
       const tx_rst = document.getElementById('tx_rst').value;
-      const tx_qth = document.getElementById('tx_qth').value;  // from Station Setup ("tx_state" field)
+      const tx_qth = document.getElementById('tx_qth').value;
       const utc_offset = parseInt(document.getElementById('utc_offset').value, 10);
-
       if (!tx_call || !tx_rst || !tx_qth) {
         alert("Please fill in the Call, rst, and tx_state fields.");
         return;
       }
-
-      // Compute the adjusted local time (qso_time) using the UTC offset
       let now = new Date();
-      // Adjust hours based on utc_offset (which can be positive or negative)
-      now.setHours(now.getHours() - utc_offset);
+      now.setHours(now.getHours() + utc_offset);
       qso_time = formatDateTime(now);
       console.log("Adjusted QSO time:", qso_time);
-
-      // Assemble the pota_start_msg:
-      // Format: tx_call + " tnx " + get_dayp() + tx_rst + " " + tx_rst + " " + tx_qth + " " + tx_qth + "bk"
-      const pota_start_msg = tx_call + " tnx " + get_dayp() + " " + tx_rst + " " + tx_rst + " " + tx_qth + " " + tx_qth + "bk";
+      const pota_start_msg = tx_call + "+tnx+" + get_dayp() + "+" + tx_rst + "+" + tx_rst + "+" + tx_qth + "+" + tx_qth + "+bk";
       sendMessage(pota_start_msg);
     });
 
     // POTA/SOTA: End and Log button event
     document.getElementById('endAndLog').addEventListener('click', function() {
-      // Send the end message
-      const endMsg = "tnx agn 72 k e e";
+      const endMsg = "tnx+agn+72+k+e+e";
       sendMessage(endMsg);
-
-      // Retrieve the values for the log
       const tx_call = document.getElementById('tx_call').value;
       const tx_rst = document.getElementById('tx_rst').value;
       const rx_rst = document.getElementById('rx_rst').value;
       const rx_qth = document.getElementById('rx_qth').value;
-
       if (!qso_time) {
         alert("Please start a POTA/SOTA session before ending and logging.");
         return;
       }
-
-      // According to the spec, the log line is:
-      // tx_call + "," + qso_time in YYYY/MM/DD HH:MM:SS format + "," + tx_rst + "," + rx_rst + "," + rx_rst + "," + rx_qth
       const logLine = `${tx_call},${qso_time},${tx_rst},${rx_rst},${rx_rst},${rx_qth}`;
       const logArea = document.getElementById('logArea');
       logArea.value += logLine + "\n";
