@@ -11,7 +11,6 @@
       padding: 0;
       background-color: black;
       color: #F5C710;
-      overflow: hidden; /* Prevent body scroll since our content div will scroll */
     }
     a, h1, h2, h3, h4, h5, h6, p, label, input, button, textarea, legend {
       color: #F5C710;
@@ -20,39 +19,33 @@
       border: 3px solid #F5C710;
       border-radius: 10px;
     }
-    /* Fixed Banner */
-    #banner {
+    /* Fixed Header */
+    header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      background-color: black;
-      padding: 15px;
       z-index: 1000;
       text-align: center;
+      padding: 0px;
+      background-color: black;
     }
-    #banner img {
+    header img {
       max-width: 100%;
       height: auto;
       display: block;
       margin: 0 auto;
     }
-    /* Content Container: fills remaining space and scrolls */
-    #content {
-      position: absolute;
-      top: 130px; /* Adjust this value if you change the banner height */
-      bottom: 0;
-      left: 0;
-      right: 0;
-      overflow-y: auto;
-      padding: 15px;
-      box-sizing: border-box;
+    /* Content container to offset fixed header */
+    .content {
+      margin-top: 700px; /* Adjust this value if your header height changes */
     }
     /* Top Sections: Station Setup and Auto Keyer side by side */
     #topSections {
       display: flex;
       gap: 15px;
-      margin-bottom: 15px;
+      padding: 15px;
+      box-sizing: border-box;
     }
     #topSections > section {
       flex: 1;
@@ -62,8 +55,8 @@
     section {
       border-bottom: 3px solid #F5C710;
       padding: 15px;
+      width: 100%;
       box-sizing: border-box;
-      margin-bottom: 15px;
     }
     fieldset {
       margin-bottom: 10px;
@@ -114,11 +107,13 @@
     .inline-group label {
       margin-right: 5px;
     }
-    /* Bottom Container: Two Columns, equal height */
+    /* Bottom Container: Two Columns, with equal height */
     #bottomContainer {
       display: flex;
       gap: 15px;
-      margin-bottom: 15px;
+      padding: 15px;
+      box-sizing: border-box;
+      align-items: stretch;
     }
     #leftColumn, #rightColumn {
       flex: 1;
@@ -129,7 +124,7 @@
       padding: 15px;
       box-sizing: border-box;
     }
-    /* Right Column: SDR and RBN Panels */
+    /* Right Column: will stretch to match left column */
     #rightColumn {
       border: 3px solid #F5C710;
       border-radius: 10px;
@@ -137,7 +132,6 @@
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      /* Let it stretch naturally to match left column height */
     }
     /* SDR Panel: fixed height of 200px */
     .sdr-container {
@@ -160,7 +154,7 @@
     }
     /* (Optional) Iframes Section */
     #iframesSection {
-      margin-bottom: 15px;
+      padding: 15px;
     }
     #iframesSection iframe {
       width: 100%;
@@ -171,11 +165,11 @@
   </style>
 </head>
 <body>
-  <div id="banner" class="box-border">
+  <header class="box-border">
     <img src="toucs_web_station.jpg" alt="TouCans Web Station Banner">
-  </div>
-  
-  <div id="content">
+  </header>
+
+  <div class="content">
     <!-- Top Sections: Station Setup and Auto Keyer -->
     <div id="topSections">
       <!-- Station Setup -->
@@ -376,7 +370,21 @@
       }
       sendMessage(custMsg);
     });
+    qso_time = "";
 
+    function getUTCTimeFormatted() {
+      const now = new Date();
+      const yyyy = now.getUTCFullYear();
+      const mm = String(now.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+      const dd = String(now.getUTCDate()).padStart(2, '0');
+      const hh = String(now.getUTCHours()).padStart(2, '0');
+      const mi = String(now.getUTCMinutes()).padStart(2, '0');
+      const ss = String(now.getUTCSeconds()).padStart(2, '0');
+
+      return `${yyyy}/${mm}/${dd} ${hh}:${mi}:${ss}`;
+    }      
+      
+      
     // POTA/SOTA: Start button event
     document.getElementById('startPota').addEventListener('click', function() {
       const tx_call = document.getElementById('tx_call').value;
@@ -388,8 +396,9 @@
         return;
       }
       let now = new Date();
-      now.setHours(now.getHours() + utc_offset);
-      qso_time = formatDateTime(now);
+      qso_time = getUTCTimeFormatted();
+      //now.setHours(now.getHours() + utc_offset);
+      //qso_time = formatDateTime(now);
       console.log("Adjusted QSO time:", qso_time);
       const pota_start_msg = tx_call + "+tnx+" + get_dayp() + "+" + tx_rst + "+" + tx_rst + "+" + tx_qth + "+" + tx_qth + "+bk";
       sendMessage(pota_start_msg);
