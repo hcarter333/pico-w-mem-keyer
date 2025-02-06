@@ -311,7 +311,7 @@ async def main():
 #print('IP Address To Connect to:: ' + ap.ifconfig()[0])
 ap = network.WLAN(network.STA_IF)
 ap.active(True)
-ap.connect("krypto", "krypto3lefty")
+ap.connect("yourap", "yourpassword")
 
 max_wait = 10
 while max_wait > 0:
